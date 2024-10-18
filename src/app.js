@@ -29,6 +29,9 @@ app.use(express.static("public"));
 app.use(cookieParser());
 // middleware which handle default error
 // routes
+app.get('/',function(req,res){
+    return send('<h1>Project is running </h1>')
+})
 
 app.use('/v1/api/auth',AuthRoute);
 app.use('/v1/api/product',ProductRoute);
