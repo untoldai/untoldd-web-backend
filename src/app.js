@@ -11,12 +11,11 @@ const app = express();
 
 
 
-app.use(
-    cors({
-        origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN : '*', 
-        credentials: true,
-    })
-);
+
+  cors({
+    origin: "*",
+    credentials: true,
+  })
 
 //this is middleware that is use to request json payload with limit
 app.use(express.json({ limit: "16kb" }));
@@ -30,7 +29,7 @@ app.use(cookieParser());
 // middleware which handle default error
 // routes
 app.get('/',function(req,res){
-    return send('Project is running ');
+    return json('Project is running ');
 })
 
 app.use('/v1/api/auth',AuthRoute);
