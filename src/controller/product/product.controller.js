@@ -11,12 +11,12 @@ let productController = {};
 
 
 productController.addNewByAdminProduct = async (req, res) => {
-    const { error } = productValidationSchema.validate(req.body);
+    // const { error } = productValidationSchema.validate(req.body);
 
-    if (error) {
-        return errorResponse(res, 400, "Validation failed", res.status(400).json({ message: error.details[0].message }));
-    }
-
+    // if (error) {
+    //     return errorResponse(res, 400, "Validation failed", res.status(400).json({ message: error.details[0].message }));
+    // }
+console.log(req.body)
     try {
         const imageUrls = [];
 
@@ -46,6 +46,7 @@ productController.addNewByAdminProduct = async (req, res) => {
         }
         return errorResponse(res, 500, "Something went wrong while adding the product");
     } catch (error) {
+        console.log(error)
         return errorResponse(res, 500, message.SERVER_ERROR, error);
     }
 };
