@@ -9,9 +9,15 @@ import { errorResponse } from "./utils/response.utils.js";
 const app = express();
 
 
+const corsOptions = {
+  origin: 'http://localhost:5173', // Replace with your React app's origin
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+};
+
+app.use(cors(corsOptions));
 
 
-app.use(cors());
 
 //this is middleware that is use to request json payload with limit
 app.use(express.json({ limit: "16kb" }));
