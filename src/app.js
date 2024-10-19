@@ -10,7 +10,7 @@ const app = express();
 
 
 const corsOptions = {
-  origin: 'http://localhost:5173', // Replace with your React app's origin
+  origin: '*', // Replace with your React app's origin
   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
 };
