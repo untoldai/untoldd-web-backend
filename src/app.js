@@ -11,12 +11,7 @@ const app = express();
 
 
 
-app.use(
-  cors({
-    origin: "*",
-    credentials: true,
-  })
-);
+app.use(cors());
 
 //this is middleware that is use to request json payload with limit
 app.use(express.json({ limit: "16kb" }));
