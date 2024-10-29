@@ -89,7 +89,7 @@ authController.userLogin = asyncHanlder(async (req, res) => {
         }
         const isUserExists = await User.findOne({
             $and: [
-                { is_admin: true },
+                { is_admin: false, is_user: true },
                 {
                     $or: [
                         { 'contact.email': email },
@@ -247,4 +247,34 @@ authController.getAdminProfileDetails = asyncHanlder(async (req, res) => {
         return errorResponse(res, 500, message.SERVER_ERROR);
     }
 });
+
+// get  all user list 
+
+authController.getUserLists = asyncHanlder(async (req, res) => {
+    try {
+        const limit = req.limit || 10;
+        const page = req.page || 10;
+        //calucalte how many page to skip in paginateion
+        const skitp = (page - 1) * limit;
+
+        const data = await User.find({ is_user: true }).limit(limit).skip(skitp);
+        const total_data=await User.countDocuments({is_user:true});
+         // Calculate total pages
+         const total_pages = Math.ceil(total_data / limit);
+
+         // Build pagination metadata
+         const pagination = {
+             per_page: limit,
+             current_page: page,
+             first_page: 1,
+             last_page: total_pages,
+             total_data: total_data,
+             next_page_url: page < total_pages ? `${req.protocol}://${req.get('host')}${req.baseUrl}?page=${page + 1}&limit=${limit}${category ? `&category=${category}` : ''}` : null
+         };
+        return successResponse(res, 200, {data,pagination}, message.FETCH_SUCCESS);
+
+    } catch (error) {
+        return errorResponse(res, 500, message.SERVER_ERROR, error);
+    }
+})
 export default authController;

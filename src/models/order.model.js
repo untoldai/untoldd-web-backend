@@ -1,3 +1,7 @@
+import mongoose from 'mongoose';
+
+const Schema = mongoose.Schema;
+
 const orderSchema = new Schema({
     user_id: {
         type: Schema.Types.ObjectId,
@@ -27,8 +31,8 @@ const orderSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['PENDING', 'SHIPPED', 'DELIVERED', 'CANCEL'],
-        default: 'PENDING',
+        enum: ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCEL'],
+        default: 'CONFIRMED',
         description: "Order status"
     }
 }, { timestamps: true });

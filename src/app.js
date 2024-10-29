@@ -4,7 +4,8 @@ import cookieParser from "cookie-parser"
 // importing router 
 import AuthRoute from "./routes/v1/auth/auth.routes.js";
 import ProductRoute from "./routes/v1/product/product.routes.js"
-
+import CartRoute from "./routes/v1/cart/cart.routes.js";
+import UserRoute from "./routes/v1/user/user.routes.js";
 import { errorResponse } from "./utils/response.utils.js";
 const app = express();
 
@@ -36,6 +37,8 @@ app.get('/',function(req,res){
 
 app.use('/v1/api/auth',AuthRoute);
 app.use('/v1/api/product',ProductRoute);
+app.use('/v1/api/cart',CartRoute);
+app.use('/v1/api/user',UserRoute);
 app.use((req, res, next) => {
     errorResponse(res, 404, 'Not Found');
 });

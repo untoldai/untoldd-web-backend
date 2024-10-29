@@ -9,4 +9,7 @@ router.delete('/admin/delete-product', verifyAdminToken, productController.delet
 router.get('/all-product', productController.getProductList);
 router.put('/admin/toggle-active', verifyAdminToken, productController.toggleActiveProduct);
 router.put('/admin/toggle-features', verifyAdminToken, productController.toggleFeatureProduct);
+
+// product for website 
+router.get('/details',productController.getproductdetails)
 export default router;

@@ -14,5 +14,6 @@ router.put('/profile/change-password',verifyUserToken,authController.userChangeP
 router.post('/admin/login',authController.adminLogin);
 router.get('/admin/profile',verifyAdminToken,authController.getLoginAdminProfile)
 router.get('/admin/profile-details',verifyAdminToken,authController.getAdminProfileDetails);
+router.get('/admin/user-lists',verifyAdminToken,authController.getUserLists);
 
 export default router

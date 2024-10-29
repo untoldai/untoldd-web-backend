@@ -71,6 +71,11 @@ const productSchema = new Schema({
         unique: true,
         required: [true, 'SKU is required']
     },
+    video_url: {
+        type: String,
+        trim: true,
+
+    },
     images: [
         {
             url: {
