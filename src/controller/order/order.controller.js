@@ -10,22 +10,10 @@ import { message } from "../../constant/message.js";
 // Create a new order
 orderController.createOrder = async (req, res) => {
     try {
-        const { user_id, products } = req.body;
+        const {  producId, } = req.body;
 
         // Validate totalAmount
-        let totalAmount = 0;
-        for (const product of products) {
-            if (product.quantity < 1) {
-                return errorResponse(res, 400, 'Quantity must be at least 1 for all products.');
-            }
-            // Assuming you have a function to get the price of a product
-            const productDetails = await Product.findById(product.productId);
-            if (!productDetails) {
-                return errorResponse(res, 400, `Product with ID ${product.productId} not found.`);
-            }
-            totalAmount += productDetails.price * product.quantity; // Calculate total amount
-        }
-
+      
         // Create a new order instance
         const newOrder = new Order({
             user_id,
