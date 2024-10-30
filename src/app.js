@@ -7,6 +7,7 @@ import ProductRoute from "./routes/v1/product/product.routes.js"
 import CartRoute from "./routes/v1/cart/cart.routes.js";
 import UserRoute from "./routes/v1/user/user.routes.js";
 import PaymentRoute from "./routes/v1/payment/payment.routes.js";
+import OrderRoute from "./routes/v1/order/order.routes.js";
 import { errorResponse } from "./utils/response.utils.js";
 const app = express();
 
@@ -40,6 +41,7 @@ app.use('/v1/api/auth',AuthRoute);
 app.use('/v1/api/product',ProductRoute);
 app.use('/v1/api/cart',CartRoute);
 app.use('/v1/api/user',UserRoute);
+app.use('/v1/api/order',OrderRoute);
 app.use("/v1/api/payment",PaymentRoute);
 app.use((req, res, next) => {
     errorResponse(res, 404, 'Not Found');

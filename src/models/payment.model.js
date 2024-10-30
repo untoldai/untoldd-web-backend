@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const paymentSchema = new Schema({
-    user_id:{
+    user_id: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: [true, 'User Id is required']
@@ -19,7 +19,7 @@ const paymentSchema = new Schema({
     },
     paymentMethod: {
         type: String,
-        enum: ['CREDIT_CARD', 'DEBIT_CARD', 'PAYPAL', 'BANK_TRANSFER', "UPI","ONLINE"],
+        enum: ['CREDIT_CARD', 'DEBIT_CARD', 'PAYPAL', 'BANK_TRANSFER', "UPI", "ONLINE"],
         required: [true, 'Payment method is required']
     },
     status: {
@@ -34,12 +34,12 @@ const paymentSchema = new Schema({
     },
     paymentId: {
         type: String,
-        unique:true
-      },
-      signatureId: {
+        unique: true,
+    },
+    signatureId: {
         type: String,
-        unique:true
-      },
+        unique: true
+    },
     paymentDate: {
         type: Date,
         default: Date.now,

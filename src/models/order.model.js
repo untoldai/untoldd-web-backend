@@ -18,8 +18,21 @@ const orderSchema = new Schema({
             type: Number,
             required: [true, 'Quantity is required'],
             min: [1, 'Quantity must be at least 1']
+        },
+        unit: {
+            type: String,
+        },
+        variants: {
+            type: String
+        },
+        price: {
+            type: Number
         }
     }],
+    address_id:{
+        type: Schema.Types.ObjectId,
+        ref: 'Address',
+    },
     totalAmount: {
         type: Number,
         required: [true, 'Total amount is required']
@@ -31,8 +44,8 @@ const orderSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCEL'],
-        default: 'CONFIRMED',
+        enum: ['CREATED', 'PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCEL'],
+        default: 'CREATED',
         description: "Order status"
     }
 }, { timestamps: true });
