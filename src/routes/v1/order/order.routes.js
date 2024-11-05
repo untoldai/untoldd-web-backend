@@ -5,6 +5,7 @@ const router = Router();
 
 router.post('/create', verifyUserToken, orderController.createOrder);
 router.post('/update', verifyUserToken, orderController.updateOrder);
+router.get("/users/orders",verifyUserToken,orderController.getOrderListForUser);
 
 
 export default router;

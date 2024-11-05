@@ -121,6 +121,53 @@ productController.getProductList = asyncHanlder(async (req, res) => {
         return errorResponse(res, 500, message.SERVER_ERROR, error);
     }
 });
+productController.getAdminProductList = asyncHanlder(async (req, res) => {
+    try {
+        // Get page and limit from the request query, or set default values
+        const page = parseInt(req.query.page) || 1; // Default to page 1
+        const limit = parseInt(req.query.limit) || 20; // Default to 20 items per page
+        const category = req.query.category || ""; // Get category from query
+
+        // Calculate how many records to skip for pagination
+        const skip = (page - 1) * limit;
+
+        // Create a filter object based on the category
+        const filter = {
+           
+        };
+
+        // If category is provided, add it to the filter
+        if (category) {
+            filter.type = category;
+        }
+
+        // Fetch products with pagination
+        const products = await Product.find(filter)
+            .skip(skip)
+            .limit(limit);
+
+        // Count total active products for pagination
+        const total_data = await Product.countDocuments(filter);
+
+        // Calculate total pages
+        const total_pages = Math.ceil(total_data / limit);
+
+        // Build pagination metadata
+        const pagination = {
+            per_page: limit,
+            current_page: page,
+            first_page: 1,
+            last_page: total_pages,
+            total_data: total_data,
+            next_page_url: page < total_pages ? `${req.protocol}://${req.get('host')}${req.baseUrl}?page=${page + 1}&limit=${limit}${category ? `&category=${category}` : ''}` : null
+        };
+
+        // Send the paginated response with products and pagination metadata
+        return successResponse(res, 200, { products, pagination }, message.FETCH_SUCCESS);
+    } catch (error) {
+        return errorResponse(res, 500, message.SERVER_ERROR, error);
+    }
+});
 // get product description 
 
 productController.getproductdetails = asyncHanlder(async (req, res) => {

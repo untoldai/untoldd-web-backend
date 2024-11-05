@@ -6,10 +6,11 @@ const router = Router();
 
 router.post('/admin/add-product', verifyAdminToken, upload.array('images', 3), productController.addNewByAdminProduct );
 router.delete('/admin/delete-product', verifyAdminToken, productController.deleteProductByAdmin);
-router.get('/all-product', productController.getProductList);
+router.get('/admin/all-product', productController.getAdminProductList);
 router.put('/admin/toggle-active', verifyAdminToken, productController.toggleActiveProduct);
 router.put('/admin/toggle-features', verifyAdminToken, productController.toggleFeatureProduct);
 
 // product for website 
 router.get('/details',productController.getproductdetails)
+router.get('/all-product', productController.getProductList);
 export default router;
