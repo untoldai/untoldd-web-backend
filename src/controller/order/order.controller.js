@@ -6,12 +6,13 @@ export const orderController = {};
 
 import { message } from "../../constant/message.js";
 import mongoose from "mongoose";
+import Payment from "../../models/payment.model.js";
 
 // Create a new order
 // Create a new order
 orderController.createOrder = async (req, res) => {
     try {
-        const { products, totalAmount } = req.body;
+        const { products, totalAmount, address_id } = req.body;
 
         // Validate input
         if (!products || products.length === 0 || !totalAmount) {
@@ -22,7 +23,8 @@ orderController.createOrder = async (req, res) => {
         const newOrder = new Order({
             user_id: req.user._id,
             products,
-            totalAmount
+            totalAmount,
+            address_id
         });
 
         // Save the order to the database
@@ -102,6 +104,9 @@ orderController.getOrderListForUser = asyncHanlder(async (req, res) => {
             },
             {
                 $limit: limit // Limit for pagination
+            },
+            {
+                $sort: { orderDate: -1 }
             }
         ]);
 
@@ -138,20 +143,25 @@ orderController.getOrderListForAdmin = asyncHanlder(async (req, res) => {
 
         // Fetch products with pagination
         const orders = await Order.aggregate([
+
             {
-                $unwind: '$users'
+                $unwind: '$products' // Deconstruct the products array
             },
             {
                 $lookup: {
                     from: "users",
                     localField: "user_id",
                     foreignField: "_id",
-                    as: 'users'
+                    as: "userDetails"
                 }
-
             },
             {
-                $unwind: '$products' // Deconstruct the products array
+                $lookup: {
+                    from: "addresses", // Assumed that "address" is your collection for addresses
+                    localField: "address_id",
+                    foreignField: "_id",
+                    as: "orderAddress"
+                }
             },
             {
                 $lookup: {
@@ -161,6 +171,7 @@ orderController.getOrderListForAdmin = asyncHanlder(async (req, res) => {
                     as: 'productDetails'
                 }
             },
+
             {
                 $unwind: { path: '$productDetails', preserveNullAndEmptyArrays: true } // Optional
             },
@@ -170,12 +181,13 @@ orderController.getOrderListForAdmin = asyncHanlder(async (req, res) => {
                     totalAmount: 1,
                     orderDate: 1,
                     status: 1,
-                    'users.name': 1,
+                    'userDetails': 1,
                     'products.quantity': 1,
 
                     'productDetails.name': 1,
                     'productDetails.images': { $arrayElemAt: ['$productDetails.images', 0] }, // Get the first image
                     'productDetails.description': 1,
+                    "orderAddress": 1,
                 }
             },
             {
@@ -183,12 +195,15 @@ orderController.getOrderListForAdmin = asyncHanlder(async (req, res) => {
             },
             {
                 $limit: limit // Limit for pagination
+            },
+            {
+                $sort: { orderDate: -1 }
             }
         ]);
 
 
         // Count total active products for pagination
-        const total_data = await Order.countDocuments({ user_id: req.user._id });
+        const total_data = await Order.countDocuments();
 
         // Calculate total pages
         const total_pages = Math.ceil(total_data / limit);
@@ -210,3 +225,84 @@ orderController.getOrderListForAdmin = asyncHanlder(async (req, res) => {
         return errorResponse(res, 500, message.SERVER_ERROR, error);
     }
 })
+
+orderController.getSingleOrderDetails = asyncHanlder(async (req, res) => {
+    try {
+        // Get the orderId from query parameters
+        const orderId = req.query.orderId; // Ensure you're accessing the orderId correctly
+
+        // Validate orderId
+        if (!orderId || orderId === "") {
+            return errorResponse(res, 204, "Order ID not found");
+        }
+
+
+        // Fetch order details using aggregation
+        const orderDetails = await Order.aggregate([
+            {
+                $match: {
+                    _id: new mongoose.Types.ObjectId(orderId) // Ensure orderId is converted to ObjectId
+                }
+            },
+            {
+                $unwind: {
+                    path: '$products', // Unwind the products array, if needed
+                    preserveNullAndEmptyArrays: true // Optional, if you want to keep empty arrays
+                }
+            },
+            {
+                $lookup: {
+                    from: "products", // Assumed that "product" is your collection for products
+                    localField: 'products.productId',
+                    foreignField: "_id",
+                    as: "productsDetails"
+                }
+            },
+
+            {
+                $lookup: {
+                    from: "addresses", // Assumed that "address" is your collection for addresses
+                    localField: "address_id",
+                    foreignField: "_id",
+                    as: "orderAddress"
+                }
+            },
+            {
+                $lookup: {
+                    from: "users", // Assumed that "users" is your collection for user details
+                    localField: "user_id",
+                    foreignField: "_id",
+                    as: "userDetails",
+
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    totalAmount: 1,
+                    orderDate: 1,
+                    status: 1,
+                    'products.quantity': 1,
+                    'products.price': 1,
+                    'productsDetails.name': 1,
+                    'productsDetails.images': { $arrayElemAt: ['$productsDetails.images', 0] }, // Get the first image
+                    'productsDetails.description': 1,
+                    "orderAddress": 1,
+                    "userDetails": 1
+                }
+            },
+        ]);
+
+        // If no order details are found
+        if (!orderDetails || orderDetails.length === 0) {
+            return errorResponse(res, 404, "Order not found");
+        }
+        const payment = await Payment.findOne({ order_id: new mongoose.Types.ObjectId(orderId) });
+        // Return the order details with a success response
+        return successResponse(res, 200, { orderDetails, payment }, "Order details fetched successfully");
+
+    } catch (error) {
+        console.log(error);
+        return errorResponse(res, 500, message.SERVER_ERROR, error);
+    }
+});
