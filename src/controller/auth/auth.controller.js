@@ -252,26 +252,187 @@ authController.getAdminProfileDetails = asyncHanlder(async (req, res) => {
 
 authController.getUserLists = asyncHanlder(async (req, res) => {
     try {
-        const limit = req.limit || 10;
-        const page = req.page || 10;
+        const limit = parseInt(req.limit, 10) || 10;
+        const page = parseInt(req.page, 10) || 1;
+
         //calucalte how many page to skip in paginateion
-        const skitp = (page - 1) * limit;
+        const skip = (page - 1) * limit;
 
-        const data = await User.find({ is_user: true }).limit(limit).skip(skitp);
-        const total_data=await User.countDocuments({is_user:true});
-         // Calculate total pages
-         const total_pages = Math.ceil(total_data / limit);
 
-         // Build pagination metadata
-         const pagination = {
-             per_page: limit,
-             current_page: page,
-             first_page: 1,
-             last_page: total_pages,
-             total_data: total_data,
-             next_page_url: page < total_pages ? `${req.protocol}://${req.get('host')}${req.baseUrl}?page=${page + 1}&limit=${limit}${category ? `&category=${category}` : ''}` : null
-         };
-        return successResponse(res, 200, {data,pagination}, message.FETCH_SUCCESS);
+        const data = await User.find({ is_user: true }).limit(limit).skip(skip).select(['-password','-refreshToken']);
+        
+        const total_data = await User.countDocuments({ is_user: true });
+        // Calculate total pages
+        const total_pages = Math.ceil(total_data / limit);
+
+        // Build pagination metadata
+        const pagination = {
+            per_page: limit,
+            current_page: page,
+            first_page: 1,
+            last_page: total_pages,
+            total_data: total_data,
+            next_page_url: page < total_pages ? `${req.protocol}://${req.get('host')}${req.baseUrl}?page=${page + 1}&limit=${limit}${category ? `&category=${category}` : ''}` : null
+        };
+        return successResponse(res, 200, { data, pagination }, message.FETCH_SUCCESS);
+
+    } catch (error) {
+        return errorResponse(res, 500, message.SERVER_ERROR, error);
+    }
+})
+
+
+
+//authentication for incluncer
+authController.registerInfluncer = asyncHanlder(async (req, res) => {
+    try {
+
+        const { firstname, lastname, email, password, phone, dob } = req.body;
+
+
+        const isValid = await validateRegisterUser(req.body);
+
+        if (isValid.success === false) {
+
+            return errorResponse(res, 400, isValid.error, message.INVALID);
+        }
+        const isUserExists = await User.findOne({
+            $or: [
+
+                { 'contact.phone': phone }
+            ]
+        });
+        if (isUserExists) {
+            return successResponse(res, 409, {}, "Email or mobile already exists")
+        }
+        const newUser = await User.create({
+            name: firstname + lastname,
+            user_id: generateRandomId(firstname.toUpperCase()),
+            contact: {
+                phone: phone,
+                email: email
+            },
+            personal_details: {
+                first_name: firstname,
+                last_name: lastname,
+                dob: dob
+            },
+            password: password,
+            is_user: false,
+            is_admin: false,
+            is_Staff: false,
+            is_manufacturer: false,
+            is_influncer: true
+
+        });
+        if (!newUser) {
+            return errorResponse(res, 500, "Something went wrong while creating new user")
+        }
+        if (newUser) {
+            const accessToken = await generateAccessRefreshToken(newUser);
+
+            return successResponse(res, 201, { newUser, accessToken }, "New user register successfully");
+        }
+
+
+    } catch (error) {
+        console.log(error)
+        return errorResponse(res, 500, message.SERVER_ERROR, error);
+    }
+});
+
+authController.influencerLogin = asyncHanlder(async (req, res) => {
+    try {
+        const { user_id, email, password } = req.body;
+        if (!user_id && !email) {
+            return errorResponse(res, 422, message.INVALID);
+        }
+        if (!password || password === " ") {
+            return errorResponse(res, 422, "Password is required");
+        }
+        const isUserExists = await User.findOne({
+            $and: [
+                { is_admin: false, is_user: false, is_influncer: true },
+                {
+                    $or: [
+                        { 'contact.email': email },
+                        { 'user_id': email }
+                    ]
+                }
+            ]
+        });
+        if (!isUserExists) {
+            return errorResponse(res, 403, "Userid or email not found ");
+        }
+        const isPasswordMatch = await isUserExists.isPasswordCorrect(password);
+        if (!isPasswordMatch) {
+            return errorResponse(res, 403, "Password doest not matched");
+
+        }
+        const accessToken = await generateAccessRefreshToken(isUserExists);
+
+        const data = {
+            id: isUserExists._id,
+            user_id: isUserExists.user_id,
+            email: isUserExists.contact.email,
+            name: isUserExists.name,
+            is_admin: isUserExists.is_admin,
+            is_user: isUserExists.is_user,
+            is_manufacturer: isUserExists.is_manufacturer,
+            is_Staff: isUserExists.is_Staff,
+            is_influncer: isPasswordMatch.is_influncer
+        };
+        return successResponse(res, 200, { data, accessToken }, "Login Successfully");
+
+    } catch (error) {
+        console.log(error);
+        return errorResponse(res, 500, message.SERVER_ERROR);
+    }
+});
+
+authController.getInfluncerLoginProfile = asyncHanlder(async (req, res) => {
+    return successResponse(res, 200, req.influncer, message.FETCH_SUCCESS);
+});
+
+
+authController.getInfluncerProfileDetails = asyncHanlder(async (req, res) => {
+    try {
+
+        const data = await User.findOne({ _id: req.influncer._id, is_admin: false, is_influncer: true }).select(['-password', '-refreshToken']);
+        return successResponse(res, 200, data, message.FETCH_SUCCESS);
+
+    } catch (error) {
+        console.log(error)
+        return errorResponse(res, 500, message.SERVER_ERROR);
+    }
+});
+
+
+authController.getInfluncerLists = asyncHanlder(async (req, res) => {
+    try {
+        const limit = parseInt(req.limit, 10) || 10;
+        const page = parseInt(req.page, 10) || 1;
+
+        //calucalte how many page to skip in paginateion
+        const skip = (page - 1) * limit;
+
+
+        const data = await User.find({ is_user: false,is_influncer:true }).limit(limit).skip(skip).select(['-password','-refreshToken']);
+        
+        const total_data = await User.countDocuments({ is_user: true });
+        // Calculate total pages
+        const total_pages = Math.ceil(total_data / limit);
+
+        // Build pagination metadata
+        const pagination = {
+            per_page: limit,
+            current_page: page,
+            first_page: 1,
+            last_page: total_pages,
+            total_data: total_data,
+            next_page_url: page < total_pages ? `${req.protocol}://${req.get('host')}${req.baseUrl}?page=${page + 1}&limit=${limit}${category ? `&category=${category}` : ''}` : null
+        };
+        return successResponse(res, 200, { data, pagination }, message.FETCH_SUCCESS);
 
     } catch (error) {
         return errorResponse(res, 500, message.SERVER_ERROR, error);

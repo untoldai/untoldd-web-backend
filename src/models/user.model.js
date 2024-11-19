@@ -60,9 +60,9 @@ const userSchema = new Schema({
         required: [true, 'Password is required'],
         minlength: [8, 'Password must be at least 8 characters long'],
     },
-   avatar_url:{
-    type:String,
-   },
+    avatar_url: {
+        type: String,
+    },
     refreshToken: {
         type: String,
     },
@@ -78,10 +78,22 @@ const userSchema = new Schema({
         type: Boolean,
         default: false,
     },
+    is_influncer: {
+        type: Boolean,
+        default: false,
+    },
     is_Staff: {
         type: Boolean,
         default: false
-    }
+    },
+    is_user_login: {
+        type: Boolean,
+        default: true
+    },
+    is_influncer_login: {
+        type: Boolean,
+        default: true
+    },
 }, { timestamps: true });
 
 // Indexes for efficient querying
@@ -110,7 +122,7 @@ userSchema.methods.generateAccessToken = function () {
     if (this.is_admin) {
         secretKey = process.env.ACCESS_TOKEN_SECRET_ADMIN;
         expireTime = process.env.ACCESS_TOKEN_EXPIRES_ADMIN;
-    } else if (this.is_manufacturer) {
+    } else if (this.is_influncer) {
         secretKey = process.env.ACCESS_TOKEN_SECRET_MANUFACTURER;
         expireTime = process.env.ACCESS_TOKEN_EXPIRES_MANUFACTURER;
     } else if (this.is_user) {
@@ -129,7 +141,7 @@ userSchema.methods.generateAccessToken = function () {
             email: this.contact.email,
             roles: {
                 is_admin: this.is_admin,
-                is_manufacturer: this.is_manufacturer,
+                is_influncer: this.is_influncer,
                 is_user: this.is_user,
             },
         },
@@ -145,13 +157,14 @@ userSchema.methods.generateRefreshToken = function () {
     if (this.is_admin) {
         secretKey = process.env.REFRESH_TOKEN_SECRET_ADMIN;
         expireTime = process.env.REFRESH_TOKEN_EXPIRES_ADMIN;
-    } else if (this.is_manufacturer) {
+    } else if (this.is_influncer) {
         secretKey = process.env.REFRESH_TOKEN_SECRET_MANUFACTURER;
         expireTime = process.env.REFRESH_TOKEN_EXPIRES_MANUFACTURER;
     } else if (this.is_user) {
         secretKey = process.env.REFRESH_TOKEN_SECRET_USER;
         expireTime = process.env.REFRESH_TOKEN_EXPIRES_USER;
-    } else {
+    }
+    else {
         secretKey = process.env.REFRESH_TOKEN_SECRET_STAFF;
         expireTime = process.env.REFRESH_TOKEN_EXPIRES_STAFF;
     }
@@ -162,7 +175,7 @@ userSchema.methods.generateRefreshToken = function () {
 
             roles: {
                 is_admin: this.is_admin,
-                is_manufacturer: this.is_manufacturer,
+                is_influncer: this.is_influncer,
                 is_user: this.is_user,
             },
         },
