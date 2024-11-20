@@ -3,7 +3,7 @@ import { message } from "../../constant/message.js";
 import Product from "../../models/product.model.js";
 import { asyncHanlder } from "../../utils/asyncHandler.js";
 import { errorResponse, successResponse } from "../../utils/response.utils.js";
-import { productValidationSchema } from "../../validation/product.validation.js";
+
 import { uploadOnCloudinary } from "../../utils/cloudinary.js";
 
 let productController = {};

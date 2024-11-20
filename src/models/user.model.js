@@ -82,7 +82,7 @@ const userSchema = new Schema({
         type: Boolean,
         default: false,
     },
-    is_Staff: {
+    is_influncer_verifed: {
         type: Boolean,
         default: false
     },

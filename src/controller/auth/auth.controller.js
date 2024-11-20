@@ -37,7 +37,8 @@ authController.registerUser = asyncHanlder(async (req, res) => {
         const isUserExists = await User.findOne({
             $or: [
 
-                { 'contact.phone': phone }
+                { 'contact.phone': phone },
+                { 'contact.email': email },
             ]
         });
         if (isUserExists) {
