@@ -260,8 +260,8 @@ authController.getUserLists = asyncHanlder(async (req, res) => {
         const skip = (page - 1) * limit;
 
 
-        const data = await User.find({ is_user: true }).limit(limit).skip(skip).select(['-password','-refreshToken']);
-        
+        const data = await User.find({ is_user: true }).limit(limit).skip(skip).select(['-password', '-refreshToken']);
+
         const total_data = await User.countDocuments({ is_user: true });
         // Calculate total pages
         const total_pages = Math.ceil(total_data / limit);
@@ -273,7 +273,7 @@ authController.getUserLists = asyncHanlder(async (req, res) => {
             first_page: 1,
             last_page: total_pages,
             total_data: total_data,
-            next_page_url: page < total_pages ? `${req.protocol}://${req.get('host')}${req.baseUrl}?page=${page + 1}&limit=${limit}${category ? `&category=${category}` : ''}` : null
+            next_page_url: page < total_pages ? `${req.protocol}://${req.get('host')}${req.baseUrl}?page=${page + 1}&limit=${limit}}` : null
         };
         return successResponse(res, 200, { data, pagination }, message.FETCH_SUCCESS);
 
@@ -418,8 +418,8 @@ authController.getInfluncerLists = asyncHanlder(async (req, res) => {
         const skip = (page - 1) * limit;
 
 
-        const data = await User.find({ is_user: false,is_influncer:true }).limit(limit).skip(skip).select(['-password','-refreshToken']);
-        
+        const data = await User.find({ is_user: false, is_influncer: true }).limit(limit).skip(skip).select(['-password', '-refreshToken']);
+
         const total_data = await User.countDocuments({ is_user: true });
         // Calculate total pages
         const total_pages = Math.ceil(total_data / limit);
@@ -431,11 +431,12 @@ authController.getInfluncerLists = asyncHanlder(async (req, res) => {
             first_page: 1,
             last_page: total_pages,
             total_data: total_data,
-            next_page_url: page < total_pages ? `${req.protocol}://${req.get('host')}${req.baseUrl}?page=${page + 1}&limit=${limit}${category ? `&category=${category}` : ''}` : null
+            next_page_url: page < total_pages ? `${req.protocol}://${req.get('host')}${req.baseUrl}?page=${page + 1}&limit=${limit}}` : null
         };
         return successResponse(res, 200, { data, pagination }, message.FETCH_SUCCESS);
 
     } catch (error) {
+        console.log(error)
         return errorResponse(res, 500, message.SERVER_ERROR, error);
     }
 })

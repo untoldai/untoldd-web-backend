@@ -306,3 +306,17 @@ orderController.getSingleOrderDetails = asyncHanlder(async (req, res) => {
         return errorResponse(res, 500, message.SERVER_ERROR, error);
     }
 });
+
+orderController.updateOrderStatus = asyncHanlder(async (req, res) => {
+    try {
+        const { orderId, currentStatus } = req.query;
+        const existingOrder = await Order.findOne({ _id:new  mongoose.Types.ObjectId(orderId) });
+        
+        existingOrder.status = currentStatus;
+        await existingOrder.save();
+        return successResponse(res, 200, {}, "Order Status updated successfully")
+    } catch (error) {
+        console.log(error)
+        return errorResponse(res, 500, message.SERVER_ERROR, error);
+    }
+})
