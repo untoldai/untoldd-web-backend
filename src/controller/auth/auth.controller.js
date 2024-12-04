@@ -440,4 +440,31 @@ authController.getInfluncerLists = asyncHanlder(async (req, res) => {
         return errorResponse(res, 500, message.SERVER_ERROR, error);
     }
 })
+
+// influncer change passwrodd
+authController.inflncerChangePassword = asyncHanlder(async (req, res) => {
+    try {
+        if (!req.influncer) {
+            return errorResponse(res, 404, "Un authorized")
+        }
+        const { old_password, new_password } = req.body;
+        if (!old_password || old_password === "") {
+            return errorResponse(res, 409, 'Old Password is required');
+        }
+        if (!new_password || new_password === "") {
+            return errorResponse(res, 409, 'Old Password is required');
+        }
+        const user = await User.findById(req.influncer._id);
+        const isPaswordMatch = await user.isPasswordCorrect(old_password);
+        if (!isPaswordMatch) {
+            return errorResponse(res, 401, "Old password doesn't match");
+        }
+        user.password = new_password;
+        await user.save();
+        return successResponse(res, 200, "Password Changed successfully, Please login again");
+    } catch (error) {
+        console.log(error);
+        return errorResponse(res, 500, message.SERVER_ERROR);
+    }
+});
 export default authController;

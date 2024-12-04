@@ -21,4 +21,5 @@ router.post('/influncer/register', authController.registerInfluncer);
 router.post('/influncer/login', authController.influencerLogin);
 router.get('/influncer/profile', verifyInfluncerToken, authController.getInfluncerLoginProfile);
 router.get('/influncer/profile/details', verifyInfluncerToken, authController.getInfluncerProfileDetails);
+router.post('/influncer/reset-password',verifyInfluncerToken,authController.inflncerChangePassword);
 export default router
