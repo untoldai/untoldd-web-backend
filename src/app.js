@@ -9,6 +9,7 @@ import UserRoute from "./routes/v1/user/user.routes.js";
 import PaymentRoute from "./routes/v1/payment/payment.routes.js";
 import OrderRoute from "./routes/v1/order/order.routes.js";
 import InfluncerRoute from "./routes/v1/influncer/influncer.routes.js";
+import BlogRoute from "./routes/v1/blog/blog.routes.js";
 import { errorResponse } from "./utils/response.utils.js";
 const app = express();
 
@@ -45,6 +46,7 @@ app.use('/v1/api/user', UserRoute);
 app.use('/v1/api/influencer', InfluncerRoute);
 app.use('/v1/api/order', OrderRoute);
 app.use("/v1/api/payment", PaymentRoute);
+app.use('/v1/api/blog',BlogRoute);
 app.use((req, res, next) => {
   errorResponse(res, 404, 'Not Found');
 });
