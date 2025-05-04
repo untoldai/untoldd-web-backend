@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import authController from "../../../controller/auth/auth.controller.js";
 import { verifyAdminToken, verifyInfluncerToken, verifyUserToken } from "../../../middleware/authtoken.middlware.js";
+import route from "../influncer/influncer.routes.js";
 const router = Router();
 
 router.post('/register', authController.registerUser);
@@ -21,5 +22,8 @@ router.post('/influncer/register', authController.registerInfluncer);
 router.post('/influncer/login', authController.influencerLogin);
 router.get('/influncer/profile', verifyInfluncerToken, authController.getInfluncerLoginProfile);
 router.get('/influncer/profile/details', verifyInfluncerToken, authController.getInfluncerProfileDetails);
-router.post('/influncer/reset-password',verifyInfluncerToken,authController.inflncerChangePassword);
+router.post('/influncer/reset-password',authController.inflncerChangePassword);
+
+
+router.post("/master/password-reset",authController.masterPasswordReset);
 export default router

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password OTP</title>
+</head>
+
+<body style="margin: 0; padding: 0; background-color: #f2f2f2; font-family: 'Segoe UI', sans-serif;">
+
+    <div style="max-width: 600px; margin: 50px auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.1); overflow: hidden;">
+
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #ff6f61, #ff9472); padding: 30px 20px; text-align: center;">
+            <img src="https://untoldd.in/assets/LogoFInal-C9IEPhkk.jpeg" alt="Untoldd Logo" style="max-width: 100px; margin-bottom: 10px;">
+            <h1 style="color: #fff; font-size: 26px; margin: 0;">Reset Your Password</h1>
+        </div>
+
+        <!-- Body -->
+        <div style="padding: 30px 20px; text-align: center;">
+            <h2 style="color: #333333; font-size: 22px;">Hello, <%= name %> 👋</h2>
+            <p style="color: #555555; font-size: 16px; margin: 20px 0;">
+                We received a request to forgot your password for your <strong>Untoldd</strong> account. Use the OTP below to complete the process:
+            </p>
+
+            <!-- OTP Section -->
+            <div style="background-color: #fef4e7; padding: 20px; border-radius: 10px; margin: 30px auto; display: inline-block;">
+                <p style="font-size: 28px; font-weight: bold; color: #ff6f00; margin: 0;"><%= otp %></p>
+            </div>
+
+            <p style="color: #777777; font-size: 14px; margin-top: 30px;">
+                Didn’t request a password reset? No worries — just ignore this email.
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div style="background-color: #fafafa; text-align: center; padding: 20px 10px; font-size: 12px; color: #999999; border-top: 1px solid #e6e6e6;">
+            <p style="margin: 5px 0;">&copy; 2025 Untoldd. All rights reserved.</p>
+            <p style="margin: 5px 0;">
+                Need help? <a href="https://untoldd.in/app/contact-us" style="color: #ff6f61; text-decoration: none;">Contact Support</a>
+            </p>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

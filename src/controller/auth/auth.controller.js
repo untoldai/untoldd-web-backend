@@ -1,5 +1,6 @@
 import { message } from "../../constant/message.js";
 import User from "../../models/user.model.js";
+import { OtpModal } from "../../models/otp.models.js";
 import { ApiError } from "../../utils/apiError.js";
 import { ApiResponse } from "../../utils/apiResponse.js";
 import { asyncHanlder } from "../../utils/asyncHandler.js";
@@ -467,4 +468,28 @@ authController.inflncerChangePassword = asyncHanlder(async (req, res) => {
         return errorResponse(res, 500, message.SERVER_ERROR);
     }
 });
+
+authController.masterPasswordReset = async (req, res) => {
+    try {
+        const { password, token } = req.body;
+        if (password === "" || token === "") {
+            return errorResponse(res, 422, "Missing password or token ");
+        }
+        const verifyToken = await OtpModal.findOne({ token: token, is_used: true, is_verified: true });
+        if (!verifyToken) {
+            return errorResponse(res, 403, "Invalid user or token");
+        }
+        const user = await User.findOne({ _id: verifyToken?.user_id });
+        if (!user) {
+            return errorResponse(res, 404, "User not found");
+        }
+        user.password = password;
+        await user.save();
+        await OtpModal.deleteOne({ token: verifyToken.token })
+        return successResponse(res, 200,user, "Password reset successfully,Please login again.")
+    } catch (error) {
+        console.log(error)
+        return errorResponse(res, 500, message.SERVER_ERROR, error);
+    }
+}
 export default authController;
